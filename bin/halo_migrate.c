@@ -2837,7 +2837,7 @@ cleanup:
 void
 pgut_help(bool details)
 {
-	printf("%s migrates a PostgreSQL table avoiding long locks.\n\n", PROGRAM_NAME);
+	printf("%s migrates a Halo/PostgreSQL table avoiding long locks.\n\n", PROGRAM_NAME);
 	printf("Usage:\n");
 	printf("  %s [OPTION]... [DBNAME]\n", PROGRAM_NAME);
 
