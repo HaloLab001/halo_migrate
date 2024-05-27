@@ -1,13 +1,14 @@
 #
-# pg_migrate: Makefile
+# halo_migrate: Makefile
 #
-#  Portions Copyright (c) 2008-2011, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
-#  Portions Copyright (c) 2011, Itagaki Takahiro
-#  Portions Copyright (c) 2012-2020, The Reorg Development Team
+# Portions Copyright (c) 2024, Halo Tech Co.,Ltd.
+# Portions Copyright (c) 2008-2011, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
+# Portions Copyright (c) 2011, Itagaki Takahiro
+# Portions Copyright (c) 2012-2020, The Reorg Development Team
 #
 
 PG_CONFIG ?= pg_config
-EXTENSION = pg_migrate
+EXTENSION = halo_migrate
 
 .PHONY: dist/$(EXTENSION)-$(EXTVERSION).zip
 
@@ -26,7 +27,7 @@ EXTVERSION = $(shell grep '"version":' META.json | head -1 \
 
 # NOTE: keep consistent with META.json
 ifeq ($(shell echo $$(($(INTVERSION) < 904))),1)
-$(error $(EXTENSION) requires PostgreSQL 9.4 or later. This is $(VERSION))
+$(error $(EXTENSION) requires Halo/PostgreSQL 14 or later. This is $(VERSION))
 endif
 
 SUBDIRS = bin lib regress

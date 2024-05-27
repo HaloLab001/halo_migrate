@@ -1,0 +1,5 @@
+# halo_migrate extension
+comment = 'Migrates a Halo/PostgreSQL table avoiding long locks'
+default_version = 'MIGRATE_VERSION'
+module_pathname = '$libdir/halo_migrate'
+relocatable = false

@@ -1,14 +1,12 @@
-# pg_migrate -- Perform schema changes in PostgreSQL with minimal locks
+# halo_migrate -- Perform schema changes in Halo/PostgreSQL with minimal locks
 
-- Download: https://github.com/phillbaker/pg_migrate/releases
-- Development: https://github.com/phillbaker/pg_migrate
-- Bug Reports: https://github.com/phillbaker/pg_migrate/issues
+- Project: https://github.com/HaloLab001/halo_migrate
 
 
 
 ## About
 
-pg_migrate is a PostgreSQL extension and CLI which lets you make schema
+halo_migrate is a Halo/PostgreSQL extension and CLI which lets you make schema
 changes to tables and indexes. Unlike `ALTER TABLE` it works online, without
 holding a long lived exclusive lock on the processed tables during the
 migration. It builds a copy of the target table and swaps them.
@@ -16,42 +14,30 @@ migration. It builds a copy of the target table and swaps them.
 Please check the documentation (in the ``doc`` directory or online) for
 installation and usage instructions.
 
-Forked from the excellent pg_repack project (https://reorg.github.io/pg_repack).
+Forked from the excellent pg_migrate project (https://github.com/phillbaker/pg_migrate).
 
 ## Supported Postgres Versions
 
-Postgres >= 9.6
+Halo >= 14, PostgreSQL >= 14
 
 ## Installation
 
-### Ubuntu/Debian
-
-Use `apt-get` to install the package matching the Postgres version (`postgresql-<version>-pg_migrate`) being run from [this repo's APT repository](https://github.com/phillbaker/pg_migrate/releases/tag/apt-release-amd64).
-
-To add to your `/etc/apt/sources.list.d`, add the signing GPG key, and update the package DB, run:
+Get the source from project's git site: 
 
 ```
-curl -L https://github.com/phillbaker/pg_migrate/releases/download/apt-release-amd64/apt-add-repo | sh
+git clone https://github.com/HaloLab001/halo_migrate.git
 ```
 
-Then to install, for example, for Postgres 10:
+Then to make && make install, for example, for Halo 14:
 ```
-apt-get install -y postgresql-10-pg_migrate
-```
-
-Load the pg_migrate Postgres extension in the database you want to work on:
-```
-psql -c "DROP EXTENSION IF EXISTS pg_migrate cascade; CREATE EXTENSION pg_migrate" -d postgres
+export USE_PGXS=1
+make
+make install
 ```
 
-### Mac
-
-Use `homebrew` to install the package matching the Postgres version being used.
-
+Load the halo_migrate Postgres extension in the database you want to work on:
 ```
-brew tap phillbaker/pg_migrate https://github.com/phillbaker/pg_migrate
-brew install pg_migrate_postgresql@10
-# follow the post install instructions if you're running postgres on your local machine
+psql -c "DROP EXTENSION IF EXISTS halo_migrate cascade; CREATE EXTENSION halo_migrate" -d halo0root
 ```
 
 ## Examples
@@ -59,13 +45,13 @@ brew install pg_migrate_postgresql@10
 ### Change the type of a column
 
 ```
-pg_migrate --table=my_table --alter='ALTER COLUMN id TYPE bigint' # Add --execute to run
+halo_migrate --table=my_table --alter='ALTER COLUMN id TYPE bigint' # Add --execute to run
 ```
 
 ### Add a column with a default (non-nullable)
 
 ```
-pg_migrate --table=my_table --alter='ADD COLUMN foo integer NOT NULL DEFAULT 42' # Add --execute to run
+halo_migrate --table=my_table --alter='ADD COLUMN foo integer NOT NULL DEFAULT 42' # Add --execute to run
 ```
 
 ## Known Limitations

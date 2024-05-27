@@ -1,4 +1,4 @@
-name: "postgresql-${PG}-pg_migrate"
+name: "postgresql-${PG}-halo_migrate"
 arch: "amd64"
 platform: "linux"
 version: "v${VERSION}"
@@ -11,11 +11,11 @@ vendor: phillbaker
 homepage: "http://example.com"
 license: "BSD"
 contents:
-- src: ./bin/pg_migrate
-  dst: /usr/lib/postgresql/${PG}/bin/pg_migrate
-- src: ./lib/pg_migrate.so
-  dst: /usr/lib/postgresql/${PG}/lib/pg_migrate.so
-- src: ./lib/pg_migrate--${VERSION}.sql
-  dst: /usr/share/postgresql/${PG}/extension/pg_migrate--${VERSION}.sql
-- src: ./lib/pg_migrate.control
-  dst: /usr/share/postgresql/${PG}/extension/pg_migrate.control
+- src: ./bin/halo_migrate
+  dst: /usr/lib/postgresql/${PG}/bin/halo_migrate
+- src: ./lib/halo_migrate.so
+  dst: /usr/lib/postgresql/${PG}/lib/halo_migrate.so
+- src: ./lib/halo_migrate--${VERSION}.sql
+  dst: /usr/share/postgresql/${PG}/extension/halo_migrate--${VERSION}.sql
+- src: ./lib/halo_migrate.control
+  dst: /usr/share/postgresql/${PG}/extension/halo_migrate.control

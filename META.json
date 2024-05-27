@@ -1,34 +1,34 @@
 {
-   "name": "pg_migrate",
-   "abstract": "Migrates a PostgreSQL table avoiding long locks",
-   "description": "Reorganize tables in PostgreSQL databases with minimal locks",
-   "version": "0.1.1",
+   "name": "halo_migrate",
+   "abstract": "Migrates a Halo/PostgreSQL table avoiding long locks",
+   "description": "Reorganize tables in Halo/PostgreSQL databases with minimal locks",
+   "version": "1.0",
    "maintainer": [],
    "tags": [ "maintenance", "locks", "migrations", "schema-change" ],
    "release_status": "unstable",
    "license": "bsd",
    "provides": {
-      "pg_migrate": {
-         "file": "lib/pg_migrate.sql",
-         "version": "0.1.1",
-         "abstract": "Migrates a PostgreSQL table avoiding long locks"
+      "halo_migrate": {
+         "file": "lib/halo_migrate.sql",
+         "version": "1.0",
+         "abstract": "Migrates a Halo/PostgreSQL table avoiding long locks"
       }
    },
    "prereqs": {
       "runtime": {
          "requires": {
-            "PostgreSQL": "9.6.0"
+            "PostgreSQL": "14"
          }
       }
    },
    "resources": {
-      "homepage": "https://github.com/phillbaker/pg_migrate",
+      "homepage": "https://github.com/HaloLab001/halo_migrate",
       "bugtracker": {
-         "web": "https://github.com/phillbaker/pg_migrate/issues"
+         "web": "https://github.com/HaloLab001/halo_migrate"
       },
       "repository": {
-          "url": "https://github.com/phillbaker/pg_migrate.git",
-          "web": "https://github.com/phillbaker/pg_migrate",
+          "url": "https://github.com/HaloLab001/halo_migrate.git",
+          "web": "https://github.com/HaloLab001/halo_migrate",
           "type": "git"
       }
    },

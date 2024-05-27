@@ -58,15 +58,15 @@ CREATE TABLE tbl_nn_uk (col1 int NOT NULL, col2 int NOT NULL, UNIQUE(col1, col2)
 CREATE TABLE tbl_pk_uk (col1 int NOT NULL, col2 int NOT NULL, PRIMARY KEY(col1, col2), UNIQUE(col2, col1));
 CREATE TABLE tbl_nn_puk (col1 int NOT NULL, col2 int NOT NULL);
 CREATE UNIQUE INDEX tbl_nn_puk_pcol1_idx ON tbl_nn_puk(col1) WHERE col1 < 10;
-\! pg_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=tbl_nn
+\! halo_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=tbl_nn
 -- => WARNING
-\! pg_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=tbl_uk
+\! halo_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=tbl_uk
 -- => WARNING
-\! pg_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=tbl_nn_uk
+\! halo_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=tbl_nn_uk
 -- => OK
-\! pg_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=tbl_pk_uk
+\! halo_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=tbl_pk_uk
 -- => OK
-\! pg_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=tbl_nn_puk
+\! halo_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=tbl_nn_puk
 -- => WARNING
 
 --
@@ -77,19 +77,19 @@ $$BEGIN RETURN NEW; END$$
 LANGUAGE plpgsql;
 CREATE TABLE trg1 (id integer PRIMARY KEY);
 CREATE TRIGGER repack_trigger_1 AFTER UPDATE ON trg1 FOR EACH ROW EXECUTE PROCEDURE trgtest();
-\! pg_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=trg1
+\! halo_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=trg1
 CREATE TABLE trg2 (id integer PRIMARY KEY);
 CREATE TRIGGER repack_trigger AFTER UPDATE ON trg2 FOR EACH ROW EXECUTE PROCEDURE trgtest();
-\! pg_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=trg2
+\! halo_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=trg2
 CREATE TABLE trg3 (id integer PRIMARY KEY);
 CREATE TRIGGER repack_trigger_1 BEFORE UPDATE ON trg3 FOR EACH ROW EXECUTE PROCEDURE trgtest();
-\! pg_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=trg3
+\! halo_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=trg3
 
 
 --
 -- Dry run
 --
-\! pg_migrate --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=tbl_cluster
+\! halo_migrate --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=tbl_cluster
 
 
 -- Test --schema
@@ -101,13 +101,13 @@ CREATE SCHEMA test_schema2;
 CREATE TABLE test_schema2.tbl1 (id INTEGER PRIMARY KEY);
 CREATE TABLE test_schema2.tbl2 (id INTEGER PRIMARY KEY);
 -- => OK
-\! pg_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=test_schema1.tbl1
+\! halo_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=test_schema1.tbl1
 
 
 --
 -- don't kill backend
 --
-\! pg_migrate --execute  --alter='ADD COLUMN dkb1 INT' --dbname=contrib_regression --table=tbl_cluster --no-kill-backend
+\! halo_migrate --execute  --alter='ADD COLUMN dkb1 INT' --dbname=contrib_regression --table=tbl_cluster --no-kill-backend
 
 
 --
@@ -120,10 +120,10 @@ CREATE TABLE parent_b(val integer primary key, i1 int NOT NULL);
 CREATE TABLE child_b_1(val integer primary key) INHERITS(parent_b);
 CREATE TABLE child_b_2(val integer primary key) INHERITS(parent_b);
 -- => OK
-\! pg_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=parent_a
+\! halo_migrate --execute --alter='ADD COLUMN a1 INT' --dbname=contrib_regression --table=parent_a
 -- => OK
-\! pg_migrate --execute --alter='ADD COLUMN a1 TEXT' --dbname=contrib_regression --table=child_a_1
+\! halo_migrate --execute --alter='ADD COLUMN a1 TEXT' --dbname=contrib_regression --table=child_a_1
 -- => ERROR
--- TODO non deterministic output \! pg_migrate --execute --alter='NO INHERIT parent_a' --dbname=contrib_regression --table=child_a_2
+-- TODO non deterministic output \! halo_migrate --execute --alter='NO INHERIT parent_a' --dbname=contrib_regression --table=child_a_2
 -- => ERROR
--- TODO non deterministic output \! pg_migrate --execute --alter='ADD COLUMN i1 TEXT' --dbname=contrib_regression --table=child_b_1
+-- TODO non deterministic output \! halo_migrate --execute --alter='ADD COLUMN i1 TEXT' --dbname=contrib_regression --table=child_b_1

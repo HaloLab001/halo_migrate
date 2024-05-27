@@ -1,4 +1,4 @@
 /.deps/
-/pg_migrate.sql
-/pg_migrate--[0-9.]*.sql
-/pg_migrate.control
+/halo_migrate.sql
+/halo_migrate--[0-9.]*.sql
+/halo_migrate.control

@@ -1,6 +1,7 @@
 /*
- * pg_migrate: lib/migrate.c
+ * halo_migrate: lib/migrate.c
  *
+ * Portions Copyright (c) 2024, Halo Tech Co.,Ltd.
  * Portions Copyright (c) 2008-2011, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
  * Portions Copyright (c) 2011, Itagaki Takahiro
  * Portions Copyright (c) 2012-2020, The Reorg Development Team
@@ -145,7 +146,7 @@ must_be_superuser(const char *func)
 Datum
 migrate_version(PG_FUNCTION_ARGS)
 {
-	return CStringGetTextDatum("pg_migrate " LIBRARY_VERSION);
+	return CStringGetTextDatum("halo_migrate " LIBRARY_VERSION);
 }
 
 /**
@@ -763,6 +764,8 @@ migrate_indexdef(PG_FUNCTION_ARGS)
 	StringInfoData	index_builder;
 	bool			concurrent_index = PG_GETARG_BOOL(3);
 	const char      *hash = TEXT_TO_CSTRING(PG_GETARG_TEXT_P(4));
+	const char *index_name = NULL;
+	const char *index_with_hash = NULL;
 
 	if (PG_ARGISNULL(0) || PG_ARGISNULL(1))
 		PG_RETURN_NULL();
@@ -773,10 +776,10 @@ migrate_indexdef(PG_FUNCTION_ARGS)
 	if (!PG_ARGISNULL(2))
 		tablespace = PG_GETARG_NAME(2);
 
-	const char *index_name = get_rel_name(index);
+	index_name = get_rel_name(index);
 	initStringInfo(&index_builder);
 	appendStringInfo(&index_builder, "%s_%s", index_name ? index_name : "", hash);
-	const char *index_with_hash = quote_identifier(index_builder.data);
+	index_with_hash = quote_identifier(index_builder.data);
 
 	parse_indexdef(&stmt, index, table);
 
@@ -1137,7 +1140,7 @@ migrate_init(void)
 {
 	int		ret = SPI_connect();
 	if (ret != SPI_OK_CONNECT)
-		elog(ERROR, "pg_migrate: SPI_connect returned %d", ret);
+		elog(ERROR, "halo_migrate: SPI_connect returned %d", ret);
 }
 
 /* prepare plan */
@@ -1146,7 +1149,7 @@ migrate_prepare(const char *src, int nargs, Oid *argtypes)
 {
 	SPIPlanPtr	plan = SPI_prepare(src, nargs, argtypes);
 	if (plan == NULL)
-		elog(ERROR, "pg_migrate: migrate_prepare failed (code=%d, query=%s)", SPI_result, src);
+		elog(ERROR, "halo_migrate: migrate_prepare failed (code=%d, query=%s)", SPI_result, src);
 	return plan;
 }
 

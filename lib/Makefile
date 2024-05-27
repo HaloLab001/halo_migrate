@@ -1,9 +1,10 @@
 #
-# pg_migrate: lib/Makefile
+# halo_migrate: lib/Makefile
 #
-#  Portions Copyright (c) 2008-2012, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
-#  Portions Copyright (c) 2011, Itagaki Takahiro
-#  Portions Copyright (c) 2012-2020, The Reorg Development Team
+# Portions Copyright (c) 2024, Halo Tech Co.,Ltd.
+# Portions Copyright (c) 2008-2012, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
+# Portions Copyright (c) 2011, Itagaki Takahiro
+# Portions Copyright (c) 2012-2020, The Reorg Development Team
 #
 
 PG_CONFIG ?= pg_config
@@ -12,7 +13,7 @@ PG_CONFIG ?= pg_config
 VERSION := $(shell $(PG_CONFIG) --version | sed 's/.* \([[:digit:].]\{1,\}\).*/\1/')
 INTVERSION := $(shell echo $$(($$(echo $(VERSION).0 | sed 's/\([[:digit:]]\{1,\}\)\.\([[:digit:]]\{1,\}\).*/\1*100+\2/'))))
 
-EXTENSION = pg_migrate
+EXTENSION = halo_migrate
 MODULE_big = $(EXTENSION)
 
 OBJS = migrate.o pgut/pgut-spi.o
@@ -33,7 +34,7 @@ MIGRATE_VERSION = $(shell grep '"version":' ../META.json | head -1 \
 
 PG_CPPFLAGS = -DMIGRATE_VERSION=$(MIGRATE_VERSION)
 
-DATA_built = pg_migrate--$(MIGRATE_VERSION).sql pg_migrate.control
+DATA_built = halo_migrate--$(MIGRATE_VERSION).sql halo_migrate.control
 
 USE_PGXS = 1
 PGXS := $(shell $(PG_CONFIG) --pgxs)
@@ -44,15 +45,15 @@ include $(PGXS)
 # from pg_config which we actually need.
 LIBS := $(filter-out -lpam -lxml2 -lxslt, $(LIBS))
 
-pg_migrate.sql: pg_migrate.sql.in
+halo_migrate.sql: halo_migrate.sql.in
 	echo "BEGIN;" > $@; \
 	sed 's,MODULE_PATHNAME,$$libdir/$(MODULE_big),g' $< \
 	| sed 's,MIGRATE_VERSION,$(MIGRATE_VERSION),g' >> $@; \
 	echo "COMMIT;" >> $@;
 
-pg_migrate--$(MIGRATE_VERSION).sql: pg_migrate.sql.in
+halo_migrate--$(MIGRATE_VERSION).sql: halo_migrate.sql.in
 	sed 's,MIGRATE_VERSION,$(MIGRATE_VERSION),g' $< \
 	| sed 's,relhasoids,$(RELHASOIDS),g'> $@;
 
-pg_migrate.control: pg_migrate.control.in
+halo_migrate.control: halo_migrate.control.in
 	sed 's,MIGRATE_VERSION,$(MIGRATE_VERSION),g' $< > $@

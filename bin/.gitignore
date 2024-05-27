@@ -1,7 +1,7 @@
 /.deps/
-/pg_migrate
-!/pg_migrate.*
-/pg_migrate.o
+/halo_migrate
+!/halo_migrate.*
+/halo_migrate.o
 /results/
 /sql/init.sql
 /sql/init-*.*.sql

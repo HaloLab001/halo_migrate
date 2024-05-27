@@ -1,6 +1,7 @@
 /*
- * pg_migrate: lib/pg_migrate.sql.in
+ * halo_migrate: lib/halo_migrate.sql.in
  *
+ * Portions Copyright (c) 2024, Halo Tech Co.,Ltd.
  * Portions Copyright (c) 2008-2011, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
  * Portions Copyright (c) 2011, Itagaki Takahiro
  * Portions Copyright (c) 2012-2020, The Reorg Development Team
@@ -13,7 +14,7 @@ CREATE FUNCTION migrate.version() RETURNS text AS
 LANGUAGE C IMMUTABLE STRICT;
 
 CREATE FUNCTION migrate.version_sql() RETURNS text AS
-$$SELECT 'pg_migrate MIGRATE_VERSION'::text$$
+$$SELECT 'halo_migrate MIGRATE_VERSION'::text$$
 LANGUAGE SQL IMMUTABLE STRICT;
 
 -- Always specify search_path to 'pg_catalog' so that we

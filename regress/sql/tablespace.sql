@@ -44,7 +44,7 @@ FROM pg_index i join pg_class c ON c.oid = indexrelid
 WHERE indrelid = 'testts1'::regclass ORDER BY relname;
 
 -- can specify the tablespace, other than default
-\! pg_migrate --dbname=contrib_regression --table=testts1 --tablespace testts --alter='ADD COLUMN a1 INT' --execute
+\! halo_migrate --dbname=contrib_regression --table=testts1 --tablespace testts --alter='ADD COLUMN a1 INT' --execute
 
 SELECT relname, spcname
 FROM pg_class JOIN pg_tablespace ts ON ts.oid = reltablespace
@@ -54,7 +54,7 @@ ORDER BY relname;
 SELECT * from testts1 order by id;
 
 -- tablespace stays where it is
-\! pg_migrate --dbname=contrib_regression --table=testts1 --alter='ADD COLUMN a2 INT' --execute
+\! halo_migrate --dbname=contrib_regression --table=testts1 --alter='ADD COLUMN a2 INT' --execute
 
 SELECT relname, spcname
 FROM pg_class JOIN pg_tablespace ts ON ts.oid = reltablespace
@@ -62,7 +62,7 @@ WHERE relname ~ '^testts1' AND NOT relname ~ '^testts1_pre_migrate'
 ORDER BY relname;
 
 -- can move the tablespace back to default
-\! pg_migrate --dbname=contrib_regression --table=testts1 -s pg_default --alter='ADD COLUMN a3 INT' --execute
+\! halo_migrate --dbname=contrib_regression --table=testts1 -s pg_default --alter='ADD COLUMN a3 INT' --execute
 
 SELECT relname, spcname
 FROM pg_class JOIN pg_tablespace ts ON ts.oid = reltablespace
@@ -70,7 +70,7 @@ WHERE relname ~ '^testts1' AND NOT relname ~ '^testts1_pre_migrate'
 ORDER BY relname;
 
 -- can move the table together with the indexes
-\! pg_migrate --dbname=contrib_regression --table=testts1 --tablespace testts --alter='ADD COLUMN a4 INT' --execute
+\! halo_migrate --dbname=contrib_regression --table=testts1 --tablespace testts --alter='ADD COLUMN a4 INT' --execute
 
 SELECT relname, spcname
 FROM pg_class JOIN pg_tablespace ts ON ts.oid = reltablespace

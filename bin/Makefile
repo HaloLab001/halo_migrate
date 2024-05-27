@@ -1,16 +1,17 @@
 #
-# pg_migrate: bin/Makefile
+# halo_migrate: bin/Makefile
 #
-#  Portions Copyright (c) 2008-2012, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
-#  Portions Copyright (c) 2011, Itagaki Takahiro
-#  Portions Copyright (c) 2012-2020, The Reorg Development Team
+# Portions Copyright (c) 2024, Halo Tech Co.,Ltd.
+# Portions Copyright (c) 2008-2012, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
+# Portions Copyright (c) 2011, Itagaki Takahiro
+# Portions Copyright (c) 2012-2020, The Reorg Development Team
 #
 
 PG_CONFIG ?= pg_config
 
-SRCS = pg_migrate.c pgut/pgut.c pgut/pgut-fe.c
+SRCS = halo_migrate.c pgut/pgut.c pgut/pgut-fe.c
 OBJS = $(SRCS:.c=.o)
-PROGRAM = pg_migrate
+PROGRAM = halo_migrate
 
 
 # The version number of the program. It should be the same of the library.

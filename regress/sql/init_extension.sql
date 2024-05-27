@@ -1,3 +1,3 @@
 SET client_min_messages = warning;
-CREATE EXTENSION pg_migrate;
+CREATE EXTENSION halo_migrate;
 RESET client_min_messages;

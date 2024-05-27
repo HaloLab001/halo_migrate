@@ -1,6 +1,7 @@
 /*
- * pg_migrate.c: bin/pg_migrate.c
+ * halo_migrate.c: bin/halo_migrate.c
  *
+ * Portions Copyright (c) 2024, Halo Tech Co.,Ltd.
  * Portions Copyright (c) 2008-2011, NIPPON TELEGRAPH AND TELEPHONE CORPORATION
  * Portions Copyright (c) 2011, Itagaki Takahiro
  * Portions Copyright (c) 2012-2020, The Reorg Development Team
@@ -10,8 +11,8 @@
  * @brief Client Modules
  */
 
-const char *PROGRAM_URL		= "https://github.com/phillbaker/pg_migrate";
-const char *PROGRAM_ISSUES	= "https://github.com/phillbaker/pg_migrate/issues";
+const char *PROGRAM_URL		= "https://github.com/HaloLab001/halo_migrate";
+const char *PROGRAM_ISSUES	= "https://github.com/HaloLab001/halo_migrate/issues";
 
 #ifdef MIGRATE_VERSION
 /* macro trick to stringify a macro expansion */
@@ -67,11 +68,11 @@ const char *PROGRAM_VERSION = "unknown";
 #define POLL_TIMEOUT    3
 
 /* Compile an array of existing transactions which are active during
- * pg_migrate's setup. Some transactions we can safely ignore:
+ * halo_migrate's setup. Some transactions we can safely ignore:
  *  a. The '1/1, -1/0' lock skipped is from the bgwriter on newly promoted
  *     servers. See https://github.com/reorg/pg_reorg/issues/1
  *  b. Our own database connections
- *  c. Other pg_migrate clients, as distinguished by application_name, which
+ *  c. Other halo_migrate clients, as distinguished by application_name, which
  *     may be operating on other tables at the same time. See
  *     https://github.com/reorg/pg_repack/issues/1
  *  d. open transactions/locks existing on other databases than the actual
@@ -426,7 +427,7 @@ check_tablespace()
 }
 
 /*
- * Perform sanity checks before beginning work. Make sure pg_migrate is
+ * Perform sanity checks before beginning work. Make sure halo_migrate is
  * installed in the database, the user is a superuser, etc.
  */
 static bool
@@ -449,7 +450,7 @@ preliminary_checks(char *errbuf, size_t errsize){
 		const char	   *libver;
 		char			buf[64];
 
-		/* the string is something like "pg_migrate 1.1.7" */
+		/* the string is something like "halo_migrate 1.1.7" */
 		snprintf(buf, sizeof(buf), "%s %s", PROGRAM_NAME, PROGRAM_VERSION);
 
 		/* check the version of the C library */
@@ -1230,8 +1231,12 @@ migrate_one_table(migrate_table *table, const char *orderby, char *errbuf, size_
 	char           *schema = NULL;
 	char           *table_without_namespace = NULL;
 	migrate_foreign_key *foreign_keys;
+	char *original_primary_key_def;
+    const char *original_primary_key_name;
+    const char *backing_index_name = NULL;
+	int primary_key = 0;
 
-	/* appname will be "pg_migrate" in normal use on 9.0+, or
+	/* appname will be "halo_migrate" in normal use on 9.0+, or
 	 * "pg_regress" when run under `make installcheck`
 	 */
 	const char     *appname = getenv("PGAPPNAME");
@@ -1239,8 +1244,8 @@ migrate_one_table(migrate_table *table, const char *orderby, char *errbuf, size_
 	/* Keep track of whether we have gotten through setup to install
 	 * the migrate_trigger, log table, etc. ourselves. We don't want to
 	 * go through migrate_cleanup() if we didn't actually set up the
-	 * trigger ourselves, lest we be cleaning up another pg_migrate's mess,
-	 * or worse, interfering with a still-running pg_migrate.
+	 * trigger ourselves, lest we be cleaning up another halo_migrate's mess,
+	 * or worse, interfering with a still-running halo_migrate.
 	 */
 	bool            table_init = false;
 
@@ -1385,10 +1390,10 @@ migrate_one_table(migrate_table *table, const char *orderby, char *errbuf, size_
 						table->target_name, "migrate_trigger"),
 				 errdetail(
 					 "The trigger was probably installed during a previous"
-					 " attempt to run pg_migrate on the table which was"
+					 " attempt to run halo_migrate on the table which was"
 					 " interrupted and for some reason failed to clean up"
 					 " the temporary objects.  Please drop the trigger or drop"
-					" and recreate the pg_migrate extension altogether"
+					" and recreate the halo_migrate extension altogether"
 					 " to remove all the temporary objects left over.")));
 		goto cleanup;
 	}
@@ -1688,10 +1693,8 @@ migrate_one_table(migrate_table *table, const char *orderby, char *errbuf, size_
                     snprintf(errbuf, errsize, "%s", PQerrorMessage(connection));
             goto cleanup;
     }
-    char *original_primary_key_def;
-    const char *original_primary_key_name;
-    const char *backing_index_name = NULL;
-    int primary_key = PQntuples(res);
+    
+    primary_key = PQntuples(res);
 
     if (primary_key > 0) {
 	    IndexDef		stmt;
@@ -1708,10 +1711,12 @@ migrate_one_table(migrate_table *table, const char *orderby, char *errbuf, size_
 		for (j = 0; j < table->n_indexes; j++)
 		{
 			StringInfoData	index_sql;
+			char *original_create_index = NULL;
+
 			initStringInfo(&index_sql);
 			printfStringInfo(&index_sql, "ON migrate.table_%u USING %s (%s)%s",
 				table->target_oid, stmt.type, stmt.columns, stmt.options);
-			char *original_create_index = strdup(table->indexes[j].create_index);
+			original_create_index = strdup(table->indexes[j].create_index);
 			if (strpos(original_create_index, index_sql.data) >= 0)
 			{
 				resetStringInfo(&index_sql);
@@ -2121,7 +2126,7 @@ apply_alter_statement(PGconn *conn, Oid relid, const char *alter_sql)
 }
 
 /* Obtain an advisory lock on the table's OID, to make sure no other
- * pg_migrate is working on the table.
+ * halo_migrate is working on the table.
  */
 static bool advisory_lock(PGconn *conn, const char *relid)
 {
@@ -2144,7 +2149,7 @@ static bool advisory_lock(PGconn *conn, const char *relid)
 		elog(ERROR, "%s",  PQerrorMessage(connection));
 	}
 	else if (strcmp(getstr(res, 0, 0), "t") != 0) {
-		elog(ERROR, "Another pg_migrate command may be running on the table. Please try again later.");
+		elog(ERROR, "Another halo_migrate command may be running on the table. Please try again later.");
 	}
 	else {
 		ret = true;
@@ -2557,7 +2562,7 @@ repack_table_indexes(PGresult *index_details)
 		ereport(ERROR, (errcode(ENOMEM),
 						errmsg("Unable to calloc repacked_indexes")));
 
-	/* Check if any concurrent pg_migrate command is being run on the same
+	/* Check if any concurrent halo_migrate command is being run on the same
 	 * table.
 	 */
 	if (!advisory_lock(connection, params[1]))
@@ -2594,7 +2599,7 @@ repack_table_indexes(PGresult *index_details)
 						 errmsg("Cannot create index \"%s\".\"index_%u\", "
 								"already exists", schema_name, index),
 						 errdetail("An invalid index may have been left behind"
-								   " by a previous pg_migrate on the table"
+								   " by a previous halo_migrate on the table"
 								   " which was interrupted. Please use DROP "
 								   "INDEX \"%s\".\"index_%u\""
 								   " to remove this index and try again.",
