@@ -18,7 +18,7 @@ PROGRAM = halo_migrate
 MIGRATE_VERSION = $(shell grep '"version":' ../META.json | head -1 \
 	| sed -e 's/[ 	]*"version":[ 	]*"\(.*\)",/\1/')
 
-PG_CPPFLAGS = -I$(libpq_srcdir) -DMIGRATE_VERSION=$(MIGRATE_VERSION)
+PG_CPPFLAGS = -I$(libpq_srcdir) -DMIGRATE_VERSION=$(MIGRATE_VERSION) -Wno-unused-function
 
 ifdef DEBUG_MIGRATE
 PG_CPPFLAGS += -DDEBUG_MIGRATE

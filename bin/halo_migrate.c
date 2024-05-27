@@ -274,7 +274,7 @@ static bool lock_exclusive(PGconn *conn, const char *relid, const char *lock_que
 static bool kill_ddl(PGconn *conn, Oid relid, bool terminate);
 static bool lock_access_share(PGconn *conn, Oid relid, const char *target_name);
 static bool apply_alter_statement(PGconn *conn, Oid relid, const char *alter_sql);
-static int strpos(char *hay, char *needle);
+static int strpos(const char *hay, const char *needle);
 static void parse_indexdef(IndexDef *stmt, char *sql, const char *idxname, const char *tblname);
 
 #define SQLSTATE_INVALID_SCHEMA_NAME	"3F000"
@@ -1711,7 +1711,7 @@ migrate_one_table(migrate_table *table, const char *orderby, char *errbuf, size_
 		for (j = 0; j < table->n_indexes; j++)
 		{
 			StringInfoData	index_sql;
-			char *original_create_index = NULL;
+			const char *original_create_index = NULL;
 
 			initStringInfo(&index_sql);
 			printfStringInfo(&index_sql, "ON migrate.table_%u USING %s (%s)%s",
@@ -2265,16 +2265,13 @@ lock_exclusive(PGconn *conn, const char *relid, const char *lock_query, bool sta
 }
 
 static int
-strpos(char *hay, char *needle)
+strpos(const char *hay, const char *needle)
 {
-	char *haystack = NULL;
 	char *p;
 
-	haystack = malloc(strlen(hay));
-   	strncpy(haystack, hay, strlen(hay));
-   	p = strstr(haystack, needle);
+   	p = strstr(hay, needle);
    	if (p)
-    	return p - haystack;
+    	return p - hay;
    	return -1;
 }
 

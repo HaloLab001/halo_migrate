@@ -9,11 +9,7 @@
 
 #include "postgres_fe.h"
 #include "libpq/pqsignal.h"
-
-#if PG_VERSION_NUM >= 140000
 #include "common/string.h" /* for simple_prompt */
-#endif
-
 #include <limits.h>
 #include <sys/stat.h>
 #include <time.h>
@@ -444,28 +440,7 @@ prompt_for_password(void)
 
 #define BUFSIZE 100
 
-#if PG_VERSION_NUM < 100000
-	if (have_passwd) {
-		buf = pgut_malloc(BUFSIZE);
-		memcpy(buf, passwdbuf, sizeof(char)*BUFSIZE);
-	} else {
-		buf = simple_prompt("Password: ", BUFSIZE, false);
-		have_passwd = true;
-		passwdbuf = pgut_malloc(BUFSIZE);
-		memcpy(passwdbuf, buf, sizeof(char)*BUFSIZE);
-	}
-#elif PG_VERSION_NUM < 140000
-	buf = pgut_malloc(BUFSIZE);
-	if (have_passwd) {
-		memcpy(buf, passwdbuf, sizeof(char)*BUFSIZE);
-	} else {
-		if (buf != NULL)
-			simple_prompt("Password: ", buf, BUFSIZE, false);
-		have_passwd = true;
-		passwdbuf = pgut_malloc(BUFSIZE);
-		memcpy(passwdbuf, buf, sizeof(char)*BUFSIZE);
-	}
-#else
+
 	if (have_passwd) {
 		buf = pgut_malloc(BUFSIZE);
 		memcpy(buf, passwdbuf, sizeof(char)*BUFSIZE);
@@ -475,7 +450,6 @@ prompt_for_password(void)
 		passwdbuf = pgut_malloc(BUFSIZE);
 		memcpy(passwdbuf, buf, sizeof(char)*BUFSIZE);
 	}
-#endif
 
 	if (buf == NULL)
 		ereport(FATAL,

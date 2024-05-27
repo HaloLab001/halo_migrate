@@ -21,25 +21,19 @@
 /*
  * heap_open/heap_close was moved to table_open/table_close in 12.0
  */
-#if PG_VERSION_NUM >= 120000
 #include "access/table.h"
-#endif
+
 
 /*
  * utils/rel.h no longer includes pg_am.h as of 9.6, so need to include
  * it explicitly.
  */
-#if PG_VERSION_NUM >= 90600
 #include "catalog/pg_am.h"
-#endif
+
 /*
  * catalog/pg_foo_fn.h headers was merged back into pg_foo.h headers
  */
-#if PG_VERSION_NUM >= 110000
 #include "catalog/pg_inherits.h"
-#else
-#include "catalog/pg_inherits_fn.h"
-#endif
 #include "catalog/pg_namespace.h"
 #include "catalog/pg_opclass.h"
 #include "catalog/pg_type.h"
@@ -62,9 +56,8 @@
 #include "access/htup_details.h"
 
 /* builtins.h was reorganized for 9.5, so now we need this header */
-#if PG_VERSION_NUM >= 90500
 #include "utils/ruleutils.h"
-#endif
+
 
 PG_MODULE_MAGIC;
 
@@ -120,19 +113,13 @@ must_be_superuser(const char *func)
 /* The API of RenameRelationInternal() was changed in 9.2.
  * Use the RENAME_REL macro for compatibility across versions.
  */
-#if PG_VERSION_NUM < 120000
-#define RENAME_REL(relid, newrelname) RenameRelationInternal(relid, newrelname, true);
-#else
 #define RENAME_REL(relid, newrelname) RenameRelationInternal(relid, newrelname, true, false);
-#endif
+
 /*
  * is_index flag was added in 12.0, prefer separate macro for relation and index
  */
-#if PG_VERSION_NUM < 120000
-#define RENAME_INDEX(relid, newrelname) RENAME_REL(relid, newrelname);
-#else
 #define RENAME_INDEX(relid, newrelname) RenameRelationInternal(relid, newrelname, true, true);
-#endif
+
 
 #ifdef MIGRATE_VERSION
 /* macro trick to stringify a macro expansion */
@@ -142,6 +129,13 @@ must_be_superuser(const char *func)
 #else
 #define LIBRARY_VERSION "unknown"
 #endif
+
+void
+_PG_init(void)
+{
+    if (PG_VERSION_NUM < 140000)
+        elog(ERROR, "dbms_redefinition requires Halo >= 14 & PostgreSQL >= 14.");
+}
 
 Datum
 migrate_version(PG_FUNCTION_ARGS)
@@ -364,12 +358,9 @@ get_relation_name(Oid relid)
 	char   *strver;
 	int ver;
 
-	/* Get the version of the running server (PG_VERSION_NUM would return
-	 * the version we compiled the extension with) */
+	/* Get the version of the running server  */
 	strver = GetConfigOptionByName("server_version_num", NULL
-#if PG_VERSION_NUM >= 90600
 		, false	    /* missing_ok */
-#endif
 	);
 
 	ver = atoi(strver);
@@ -380,19 +371,10 @@ get_relation_name(Oid relid)
 	 * qualified since some minor releases. Note that this change
 	 * wasn't introduced in PostgreSQL 9.2 and 9.1 releases.
 	 */
-	if ((ver >= 100000 && ver < 100003) ||
-		(ver >= 90600 && ver < 90608) ||
-		(ver >= 90500 && ver < 90512) ||
-		(ver >= 90400 && ver < 90417) ||
-		(ver >= 90300 && ver < 90322) ||
-		(ver >= 90200 && ver < 90300) ||
-		(ver >= 90100 && ver < 90200))
+	if (ver < 140000)
 	{
 		/* Qualify the name if not visible in search path */
-		if (RelationIsVisible(relid))
-			nspname = NULL;
-		else
-			nspname = get_namespace_name(nsp);
+		elog(ERROR, "halo_migrate requires Halo >= 14, PostgreSQL >= 14.");
 	}
 	else
 	{
@@ -713,11 +695,7 @@ migrate_get_order_by(PG_FUNCTION_ARGS)
 				if (indexRel == NULL)
 					indexRel = index_open(index, NoLock);
 
-#if PG_VERSION_NUM >= 110000
 				opcintype = TupleDescAttr(RelationGetDescr(indexRel), nattr)->atttypid;
-#else
-				opcintype = RelationGetDescr(indexRel)->attrs[nattr]->atttypid;
-#endif
 			}
 
 			oprid = get_opfamily_member(opfamily, opcintype, opcintype, strategy);
@@ -923,14 +901,29 @@ migrate_swap(PG_FUNCTION_ARGS)
 	}
 
 	/* swap names for toast tables and toast indexes */
-	if (reltoastrelid1 == InvalidOid)
+	if (reltoastrelid1 == InvalidOid && reltoastrelid2 == InvalidOid)
 	{
 		if (reltoastidxid1 != InvalidOid ||
-			reltoastrelid2 != InvalidOid ||
 			reltoastidxid2 != InvalidOid)
 			elog(ERROR, "migrate_swap : unexpected toast relations (T1=%u, I1=%u, T2=%u, I2=%u",
 				reltoastrelid1, reltoastidxid1, reltoastrelid2, reltoastidxid2);
 		/* do nothing */
+	}
+	else if (reltoastrelid1 == InvalidOid)
+	{
+		char	name[NAMEDATALEN];
+
+		if (reltoastidxid1 != InvalidOid ||
+			reltoastidxid2 == InvalidOid)
+			elog(ERROR, "migrate_swap : unexpected toast relations (T1=%u, I1=%u, T2=%u, I2=%u",
+				reltoastrelid1, reltoastidxid1, reltoastrelid2, reltoastidxid2);
+
+		/* rename Y to X */
+		snprintf(name, NAMEDATALEN, "pg_toast_%u", oid);
+		RENAME_REL(reltoastrelid2, name);
+		snprintf(name, NAMEDATALEN, "pg_toast_%u_index", oid);
+		RENAME_INDEX(reltoastidxid2, name);
+		CommandCounterIncrement();
 	}
 	else if (reltoastrelid2 == InvalidOid)
 	{
@@ -1183,11 +1176,7 @@ swap_heap_or_index_files(Oid r1, Oid r2)
 	CatalogIndexState indstate;
 
 	/* We need writable copies of both pg_class tuples. */
-#if PG_VERSION_NUM >= 120000
 	relRelation = table_open(RelationRelationId, RowExclusiveLock);
-#else
-	relRelation = heap_open(RelationRelationId, RowExclusiveLock);
-#endif
 
 	reltup1 = SearchSysCacheCopy1(RELOID, ObjectIdGetDatum(r1));
 	if (!HeapTupleIsValid(reltup1))
@@ -1217,19 +1206,25 @@ swap_heap_or_index_files(Oid r1, Oid r2)
 	relform2->reltoastrelid = swaptemp;
 
 	/* set rel1's frozen Xid to larger one */
-	if (TransactionIdIsNormal(relform1->relfrozenxid))
+	if (relform1->relkind != RELKIND_INDEX)
 	{
-		if (TransactionIdFollows(relform1->relfrozenxid,
-								 relform2->relfrozenxid))
-			relform1->relfrozenxid = relform2->relfrozenxid;
-		else
-			relform2->relfrozenxid = relform1->relfrozenxid;
+		TransactionId frozenxid;
+		MultiXactId	minmxid;
+	
+		frozenxid = relform1->relfrozenxid;
+		relform1->relfrozenxid = relform2->relfrozenxid;
+		relform2->relfrozenxid = frozenxid;
+
+		minmxid = relform1->relminmxid;
+		relform1->relminmxid = relform2->relminmxid;
+		relform2->relminmxid = minmxid;
 	}
 
 	/* swap size statistics too, since new rel has freshly-updated stats */
 	{
 		int32		swap_pages;
 		float4		swap_tuples;
+		int32		swap_allvisible;
 
 		swap_pages = relform1->relpages;
 		relform1->relpages = relform2->relpages;
@@ -1238,26 +1233,18 @@ swap_heap_or_index_files(Oid r1, Oid r2)
 		swap_tuples = relform1->reltuples;
 		relform1->reltuples = relform2->reltuples;
 		relform2->reltuples = swap_tuples;
+
+		swap_allvisible = relform1->relallvisible;
+		relform1->relallvisible = relform2->relallvisible;
+		relform2->relallvisible = swap_allvisible;
 	}
 
 	indstate = CatalogOpenIndexes(relRelation);
 
-#if PG_VERSION_NUM < 100000
-
-	/* Update the tuples in pg_class */
-	simple_heap_update(relRelation, &reltup1->t_self, reltup1);
-	simple_heap_update(relRelation, &reltup2->t_self, reltup2);
-
-	/* Keep system catalogs current */
-	CatalogIndexInsert(indstate, reltup1);
-	CatalogIndexInsert(indstate, reltup2);
-
-#else
 
 	CatalogTupleUpdateWithInfo(relRelation, &reltup1->t_self, reltup1, indstate);
 	CatalogTupleUpdateWithInfo(relRelation, &reltup2->t_self, reltup2, indstate);
 
-#endif
 
 	CatalogCloseIndexes(indstate);
 
@@ -1342,11 +1329,7 @@ swap_heap_or_index_files(Oid r1, Oid r2)
 	heap_freetuple(reltup1);
 	heap_freetuple(reltup2);
 
-#if PG_VERSION_NUM >= 120000
 	table_close(relRelation, RowExclusiveLock);
-#else
-	heap_close(relRelation, RowExclusiveLock);
-#endif
 }
 
 /**

@@ -18,6 +18,9 @@ typedef struct IndexDef
 	char *where;	/* WHERE content if specified */
 } IndexDef;
 
+
+extern void _PG_init(void);
+
 extern char *skip_const(const char *original_sql, char *sql, const char *arg1, const char *arg2);
 extern char *skip_ident(const char *original_sql, char *sql);
 extern char *parse_error(const char *original_sql);
