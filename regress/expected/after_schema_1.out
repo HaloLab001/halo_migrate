@@ -2,80 +2,80 @@
 -- tables schema after running migrations
 --
 \d tbl_cluster
-            Table "public.tbl_cluster"
- Column |            Type             | Modifiers 
---------+-----------------------------+-----------
- col1   | integer                     | not null
- time   | timestamp without time zone | 
- ,")    | text                        | not null
- a1     | integer                     | 
+                      Table "public.tbl_cluster"
+ Column |            Type             | Collation | Nullable | Default 
+--------+-----------------------------+-----------+----------+---------
+ col1   | integer                     |           | not null | 
+ time   | timestamp without time zone |           |          | 
+ ,")    | text                        |           | not null | 
+ a1     | bigint                      |           |          | 
 Indexes:
-    "tbl_cluster_pkey_f6d2e" PRIMARY KEY, btree (","")", col1) WITH (fillfactor='75')
-    ",") cluster_f6d2e" btree ("time", length(","")"), ","")" text_pattern_ops) WITH (fillfactor='75')
+    "tbl_cluster_pkey_f6d2e_f6d2e" PRIMARY KEY, btree (","")", col1) WITH (fillfactor='75')
+    ",") cluster_f6d2e_f6d2e" btree ("time", length(","")"), ","")" text_pattern_ops) WITH (fillfactor='75')
 
 \d tbl_gistkey
-  Table "public.tbl_gistkey"
- Column |  Type   | Modifiers 
---------+---------+-----------
- id     | integer | not null
- c      | circle  | 
- a1     | integer | 
+            Table "public.tbl_gistkey"
+ Column |  Type   | Collation | Nullable | Default 
+--------+---------+-----------+----------+---------
+ id     | integer |           | not null | 
+ c      | circle  |           |          | 
+ a1     | integer |           |          | 
 Indexes:
     "tbl_gistkey_pkey_b253a" PRIMARY KEY, btree (id)
     "cidx_circle_b253a" gist (c)
 
 \d tbl_only_ckey
-           Table "public.tbl_only_ckey"
- Column |            Type             | Modifiers 
---------+-----------------------------+-----------
- col1   | integer                     | 
- col2   | timestamp without time zone | 
- ,")    | text                        | 
+                     Table "public.tbl_only_ckey"
+ Column |            Type             | Collation | Nullable | Default 
+--------+-----------------------------+-----------+----------+---------
+ col1   | integer                     |           |          | 
+ col2   | timestamp without time zone |           |          | 
+ ,")    | text                        |           |          | 
 Indexes:
     "cidx_only_ckey" btree (col2, ","")") CLUSTER
 
 \d tbl_only_pkey
- Table "public.tbl_only_pkey"
- Column |  Type   | Modifiers 
---------+---------+-----------
- col1   | integer | not null
- ,")    | text    | 
- a1     | integer | 
+           Table "public.tbl_only_pkey"
+ Column |  Type   | Collation | Nullable | Default 
+--------+---------+-----------+----------+---------
+ col1   | integer |           | not null | 
+ ,")    | text    |           |          | 
+ a1     | integer |           |          | 
 Indexes:
     "tbl_only_pkey_pkey_5e978" PRIMARY KEY, btree (col1)
 
 \d tbl_with_dropped_column
-Table "public.tbl_with_dropped_column"
- Column |  Type   | Modifiers 
---------+---------+-----------
- c1     | text    | 
- id     | integer | not null
- c2     | text    | 
- c3     | text    | 
- a1     | integer | 
+      Table "public.tbl_with_dropped_column"
+ Column |  Type   | Collation | Nullable | Default 
+--------+---------+-----------+----------+---------
+ c1     | text    |           |          | 
+ id     | integer |           | not null | 
+ c2     | text    |           |          | 
+ c3     | text    |           |          | 
+ a1     | integer |           |          | 
 Indexes:
     "tbl_with_dropped_column_pkey_f15cf" PRIMARY KEY, btree (id) WITH (fillfactor='75')
     "idx_c1c2_f15cf" btree (c1, c2) WITH (fillfactor='75')
     "idx_c2c1_f15cf" btree (c2, c1)
 
 \d tbl_with_dropped_toast
-Table "public.tbl_with_dropped_toast"
- Column |  Type   | Modifiers 
---------+---------+-----------
- i      | integer | not null
- j      | integer | not null
- a1     | integer | 
+       Table "public.tbl_with_dropped_toast"
+ Column |  Type   | Collation | Nullable | Default 
+--------+---------+-----------+----------+---------
+ i      | integer |           | not null | 
+ j      | integer |           | not null | 
+ a1     | integer |           |          | 
 Indexes:
     "tbl_with_dropped_toast_pkey_9550c" PRIMARY KEY, btree (i, j)
 
 \d tbl_idxopts
-  Table "public.tbl_idxopts"
- Column |  Type   | Modifiers 
---------+---------+-----------
- i      | integer | not null
- t      | text    | 
- a1     | integer | 
+            Table "public.tbl_idxopts"
+ Column |  Type   | Collation | Nullable | Default 
+--------+---------+-----------+----------+---------
+ i      | numeric |           | not null | 
+ t      | text    |           |          | 
+ a1     | numeric |           |          | 
 Indexes:
-    "tbl_idxopts_pkey_0a789" PRIMARY KEY, btree (i)
-    "idxopts_t_0a789" btree (t DESC NULLS LAST) WHERE t <> 'aaa'::text
+    "tbl_idxopts_pkey_0a789_0a789_0a789" PRIMARY KEY, btree (i)
+    "idxopts_t_0a789_0a789_0a789" btree (t DESC NULLS LAST) WHERE t <> 'aaa'::text
 

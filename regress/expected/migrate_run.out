@@ -36,3 +36,13 @@ INFO: altering table with: ADD COLUMN a1 INT
 \! halo_migrate --dbname=contrib_regression --table=tbl_with_toast --alter='ADD COLUMN a1 INT' --execute
 INFO: migrating table "public.tbl_with_toast"
 INFO: altering table with: ADD COLUMN a1 INT
+-- modify column type
+\! halo_migrate --dbname=contrib_regression --table=tbl_cluster --alter='ALTER COLUMN a1 TYPE bigint' --execute
+INFO: migrating table "public.tbl_cluster"
+INFO: altering table with: ALTER COLUMN a1 TYPE bigint
+\! halo_migrate --dbname=contrib_regression --table=tbl_idxopts --alter='ALTER COLUMN a1 TYPE numeric' --execute
+INFO: migrating table "public.tbl_idxopts"
+INFO: altering table with: ALTER COLUMN a1 TYPE numeric
+\! halo_migrate --dbname=contrib_regression --table=tbl_idxopts --alter='ALTER COLUMN i TYPE numeric' --execute
+INFO: migrating table "public.tbl_idxopts"
+INFO: altering table with: ALTER COLUMN i TYPE numeric

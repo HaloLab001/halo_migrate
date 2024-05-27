@@ -8,10 +8,10 @@
  col1   | integer                     |           | not null | 
  time   | timestamp without time zone |           |          | 
  ,")    | text                        |           | not null | 
- a1     | integer                     |           |          | 
+ a1     | bigint                      |           |          | 
 Indexes:
-    "tbl_cluster_pkey_f6d2e" PRIMARY KEY, btree (","")", col1) WITH (fillfactor='75')
-    ",") cluster_f6d2e" btree ("time", length(","")"), ","")" text_pattern_ops) WITH (fillfactor='75')
+    "tbl_cluster_pkey_f6d2e_f6d2e" PRIMARY KEY, btree (","")", col1) WITH (fillfactor='75')
+    ",") cluster_f6d2e_f6d2e" btree ("time", length(","")"), ","")" text_pattern_ops) WITH (fillfactor='75')
 
 \d tbl_gistkey
             Table "public.tbl_gistkey"
@@ -72,10 +72,10 @@ Indexes:
             Table "public.tbl_idxopts"
  Column |  Type   | Collation | Nullable | Default 
 --------+---------+-----------+----------+---------
- i      | integer |           | not null | 
+ i      | numeric |           | not null | 
  t      | text    |           |          | 
- a1     | integer |           |          | 
+ a1     | numeric |           |          | 
 Indexes:
-    "tbl_idxopts_pkey_0a789" PRIMARY KEY, btree (i)
-    "idxopts_t_0a789" btree (t DESC NULLS LAST) WHERE t <> 'aaa'::text
+    "tbl_idxopts_pkey_0a789_0a789_0a789" PRIMARY KEY, btree (i)
+    "idxopts_t_0a789_0a789_0a789" btree (t DESC NULLS LAST) WHERE t <> 'aaa'::text
 

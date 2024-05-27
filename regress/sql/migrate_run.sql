@@ -14,3 +14,8 @@
 \! halo_migrate --dbname=contrib_regression --table=tbl_with_view --alter='ADD COLUMN a1 INT' --execute
 \! halo_migrate --dbname=contrib_regression --table=tbl_with_mod_column_storage --alter='ADD COLUMN a1 INT' --execute
 \! halo_migrate --dbname=contrib_regression --table=tbl_with_toast --alter='ADD COLUMN a1 INT' --execute
+
+-- modify column type
+\! halo_migrate --dbname=contrib_regression --table=tbl_cluster --alter='ALTER COLUMN a1 TYPE bigint' --execute
+\! halo_migrate --dbname=contrib_regression --table=tbl_idxopts --alter='ALTER COLUMN a1 TYPE numeric' --execute
+\! halo_migrate --dbname=contrib_regression --table=tbl_idxopts --alter='ALTER COLUMN i TYPE numeric' --execute
