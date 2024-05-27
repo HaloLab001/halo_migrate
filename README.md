@@ -16,7 +16,7 @@ installation and usage instructions.
 
 Forked from the excellent pg_migrate project (https://github.com/phillbaker/pg_migrate).
 
-## Supported Postgres Versions
+## Supported Product Versions
 
 Halo >= 14, PostgreSQL >= 14
 
@@ -35,7 +35,7 @@ make
 make install
 ```
 
-Load the halo_migrate Postgres extension in the database you want to work on:
+Load the halo_migrate extension in the database you want to work on:
 ```
 psql -c "DROP EXTENSION IF EXISTS halo_migrate cascade; CREATE EXTENSION halo_migrate" -d halo0root
 ```
@@ -56,7 +56,7 @@ halo_migrate --table=my_table --alter='ADD COLUMN foo integer NOT NULL DEFAULT 4
 
 ## Known Limitations
 
-* Unique constraints are converted into unique indexes, [they are equivalent in Postgres](https://stackoverflow.com/questions/23542794/postgres-unique-constraint-vs-index). However, this may be an unexpected change.
+* Unique constraints are converted into unique indexes, [they are equivalent in Halo/PostgreSQL](https://stackoverflow.com/questions/23542794/postgres-unique-constraint-vs-index). However, this may be an unexpected change.
 * Index names on the target table and foreign key constraints are changed during the migration.
   * If the generated names are > 63 characters, this will likely break
 * If the target table is used in views, those objects will continue to reference the original table - this is not supported currently.
