@@ -61,6 +61,6 @@ halo_migrate --table=my_table --alter='ADD COLUMN foo integer NOT NULL DEFAULT 4
   * If the generated names are > 63 characters, this will likely break
 * If the target table is used in views, those objects will continue to reference the original table - this is not supported currently.
   * If the target table is used in stored procedures, those functions are stored as text so are not linked through object IDs and will reference the migrated table.
-* DDL to drop columns or add columns without a default is not currently supported
+* DDL to drop columns is not currently supported
 * Hosted PG databases (RDS, Cloud SQL) are not supported because they do not allow installing custom extensions.
 
